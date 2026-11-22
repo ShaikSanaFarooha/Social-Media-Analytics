@@ -1,5 +1,6 @@
 """
 Modules package initialization for Social Media Analytics project.
+Includes Big Data Analytics engines: Apache Spark, Hive, Pig, and Hadoop.
 """
 
 from .data_processing import (
@@ -30,3 +31,8 @@ from .visualization import (
     generate_wordcloud_figure
 )
 
+from .spark_processing import (
+    execute_spark_sql,
+    get_spark_rdd_wordcount,
+    get_big_data_architecture_info
+)
