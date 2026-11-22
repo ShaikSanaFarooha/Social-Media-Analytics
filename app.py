@@ -10,7 +10,16 @@ Data Analytics: Pandas, NumPy, VADER, TextBlob, Plotly, Matplotlib, WordCloud
 """
 
 import os
+import sys
 import streamlit as st
+
+# Automatic Launcher: If user runs 'python app.py' or clicks the VS Code Play button,
+# automatically launch 'streamlit run app.py' so the web server boots seamlessly!
+if not st.runtime.exists():
+    from streamlit.web import cli as stcli
+    sys.argv = ["streamlit", "run", os.path.abspath(__file__)]
+    sys.exit(stcli.main())
+
 import pandas as pd
 import numpy as np
 
