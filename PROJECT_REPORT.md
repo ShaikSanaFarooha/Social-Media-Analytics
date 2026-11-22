@@ -70,6 +70,7 @@ This project presents an enterprise-grade, multi-tiered **Big Data Social Media 
 3. **Apache Hive:** Distributed Data Warehouse schema (`social_media_analytics.hql`) implementing external tables, partitioned managed tables in **ORC** (*Optimized Row Columnar*) format with Snappy compression, and ad-hoc analytical queries using **HiveQL**.
 4. **Apache Spark (PySpark):** In-memory distributed analytics leveraging **Spark DataFrames**, the **Catalyst Query Optimizer**, **Spark SQL**, and **Spark RDD** transformations (`flatMap`, `map`, `reduceByKey`).
 5. **Natural Language Processing (NLP) & Visual BI:** Automated sentiment scoring via **VADER** and **TextBlob**, hashtag intelligence, and an interactive cloud-deployed **Streamlit** dashboard.
+6. **Enterprise DevOps & Automation:** Smart automated VS Code launcher (`st.runtime.exists()`), 1-click F5 debugger configuration (`.vscode/launch.json`), and automated **GitHub Actions CI/CD pipeline** (`.github/workflows/ci.yml`).
 
 The system was evaluated on a multi-platform dataset containing 235 posts, classifying public sentiment (61.9% Positive, 22.9% Negative, 15.2% Neutral) with a Net Sentiment Score of +39.0%, and demonstrating real-time Spark SQL queries, Catalyst execution plans, and MapReduce simulations. The project proves the practical viability of integrating Hadoop, Pig, Hive, and Spark for social media opinion mining.
 
@@ -98,7 +99,7 @@ The system was evaluated on a multi-platform dataset containing 235 posts, class
    - 4.1 End-to-End Big Data Architecture
    - 4.2 Data Flow Diagrams (DFD Level 0 & Level 1)
    - 4.3 HDFS Directory Layout & Hive Schema Design
-   - 4.4 Modular Decomposition
+   - 4.4 Modular Decomposition & Project Structure
 5. **Chapter 5: Methodology and Big Data Implementation**
    - 5.1 Storage Layer: Hadoop HDFS Ingestion
    - 5.2 Processing Layer 1: Hadoop MapReduce Streaming
@@ -106,12 +107,15 @@ The system was evaluated on a multi-platform dataset containing 235 posts, class
    - 5.4 Warehousing Layer: Apache HiveQL Schema & Partitioning
    - 5.5 In-Memory Analytics: Apache Spark (PySpark) & Catalyst Optimizer
    - 5.6 NLP Sentiment Mining Engine (VADER & TextBlob)
-   - 5.7 Streamlit Cloud BI Dashboard
+   - 5.7 Automated VS Code Launcher & Debugger Configuration
+   - 5.8 GitHub Actions Continuous Integration (CI/CD) Pipeline
+   - 5.9 Streamlit Cloud BI Dashboard
 6. **Chapter 6: Results, Testing and Discussion**
    - 6.1 Dataset Characteristics & HDFS Summary
    - 6.2 Spark SQL & HiveQL Analytical Results
    - 6.3 Spark Catalyst Query Execution Plan Analysis
-   - 6.4 Software Test Cases & Verification Table
+   - 6.4 Big Data Dashboard Page Walkthrough
+   - 6.5 Software Test Cases & Verification Table
 7. **Chapter 7: Advantages, Limitations and Future Scope**
    - 7.1 Advantages
    - 7.2 Limitations
@@ -148,6 +152,7 @@ Raw social media feeds present severe Big Data engineering challenges:
 4. **Hive Warehousing:** Build an Apache Hive data warehouse (`social_media_analytics.hql`) with ORC columnar format, Snappy compression, and partitioning by platform and sentiment.
 5. **Spark Distributed Processing:** Deploy Apache Spark (PySpark) with Spark SQL and analyze Catalyst Optimizer execution plans.
 6. **Interactive BI Interface:** Provide a Streamlit web dashboard with a dedicated Big Data Console enabling users to run live Spark SQL queries, inspect Catalyst plans, and simulate MapReduce streaming.
+7. **Production DevOps:** Implement an automated VS Code launcher and GitHub Actions CI workflow to verify pipeline reliability.
 
 ---
 
@@ -204,7 +209,7 @@ Developed at UC Berkeley's AMPLab by Matei Zaharia et al., Apache Spark overcome
 - **NLP & Visualization:**
   - `vaderSentiment>=3.3.2`, `textblob>=0.18.0`
   - `streamlit>=1.30.0`, `plotly>=5.18.0`, `matplotlib>=3.8.0`, `wordcloud>=1.9.0`
-- **Hadoop Tools:** Hadoop Streaming JAR, Apache Pig 0.17+, Apache Hive 3.1+.
+- **DevOps Tools:** Git, GitHub Actions, VS Code Debugger.
 
 ---
 
@@ -241,20 +246,50 @@ flowchart TD
     end
 ```
 
-### 4.2 Data Flow Diagrams
+### 4.2 Modular Decomposition & Project Structure
 
-#### Level 0 DFD (Context Diagram)
 ```text
-[User / Analyst] ---(Social Media CSV / SQL Query)---> [ Big Data Analytics System ]
-[User / Analyst] <---(Spark Plans, Hive Tables, BI Visuals)--- [ Big Data Analytics System ]
+social_media_analytics/
+│
+├── app.py                         # Streamlit BI Dashboard + Big Data Console
+├── generate_dataset.py            # Sample dataset generator (235 posts)
+├── requirements.txt               # Updated with PySpark, Pandas, NLP, Plotly
+├── README.md                      # Big Data Architecture documentation & Badges
+├── PROJECT_REPORT.md              # Formal Academic B.Tech Report
+├── package.json                   # npm run dev wrapper
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml                 # GitHub Actions automated CI/CD pipeline
+│
+├── .vscode/
+│   └── launch.json                # VS Code 1-click F5 debugger configuration
+│
+├── .streamlit/
+│   └── config.toml                # Production theme and cloud server configuration
+│
+├── data/
+│   └── social_media_data.csv      # 235 realistic social media posts
+│
+├── hadoop/
+│   ├── mapper.py                  # Hadoop Streaming Mapper in Python
+│   ├── reducer.py                 # Hadoop Streaming Reducer in Python
+│   └── run_mapreduce.sh           # Hadoop cluster execution shell script
+│
+├── pig/
+│   ├── social_media_etl.pig       # Apache Pig Latin ETL & aggregation pipeline
+│   └── run_pig.sh                 # Pig Local / MapReduce run script
+│
+├── hive/
+│   └── social_media_analytics.hql # HiveQL database, partitioned ORC tables & queries
+│
+└── modules/
+    ├── __init__.py                # Package initializer
+    ├── data_processing.py         # Data cleaning & engagement metrics
+    ├── sentiment_analysis.py      # VADER & TextBlob NLP sentiment engine
+    ├── spark_processing.py        # PySpark SparkSession, Spark SQL, Catalyst & RDD
+    └── visualization.py           # Interactive Plotly & WordCloud visualizations
 ```
-
-#### Level 1 DFD (Detailed Big Data Pipeline)
-1. **Raw Ingestion:** HDFS stores partitioned social posts across nodes.
-2. **MapReduce Tokenization:** Mappers emit `(token, 1)`, reducers aggregate totals.
-3. **Pig ETL:** Filters invalid rows, calculates `Total_Engagement`, and groups by platform.
-4. **Hive Warehousing:** Manages schema, partitions data by platform and sentiment in ORC format.
-5. **Spark Analytics:** Loads DataFrames in-memory, executes Catalyst-optimized Spark SQL, and serves results to Streamlit.
 
 ---
 
@@ -278,9 +313,7 @@ Python MapReduce streaming scripts parse and aggregate social tokens across clus
       if line.startswith("Post_ID"): continue
       row = next(csv.reader([line]))
       if len(row) >= 4:
-          # Emit platform token
           print(f"platform_{row[2].lower()}\t1")
-          # Emit extracted hashtags
           for tag in re.findall(r'#\w+', row[3].lower()):
               print(f"hashtag_{tag}\t1")
   ```
@@ -302,28 +335,23 @@ Python MapReduce streaming scripts parse and aggregate social tokens across clus
 ### 5.3 Processing Layer 2: Apache Pig Latin ETL Pipeline
 The Pig Latin script (`pig/social_media_etl.pig`) automates data cleaning and feature engineering:
 ```pig
--- Load raw data from HDFS
 raw_posts = LOAD '/user/bigdata/social_media/input/social_media_data.csv' 
     USING PigStorage(',') 
     AS (post_id:chararray, username:chararray, platform:chararray, 
         post_text:chararray, hashtags:chararray, likes:int, comments:int, shares:int, post_date:chararray);
 
--- Clean and eliminate header row
 clean_posts = FILTER raw_posts BY post_id != 'Post_ID' AND post_id IS NOT NULL;
 
--- Compute Total Engagement
 transformed = FOREACH clean_posts GENERATE 
     post_id, username, platform, post_text,
     (likes + comments + shares) AS total_engagement;
 
--- Group by platform and aggregate metrics
 by_platform = GROUP transformed BY platform;
 platform_stats = FOREACH by_platform GENERATE 
     group AS platform,
     COUNT(transformed) AS post_count,
     AVG(transformed.total_engagement) AS avg_engagement;
 
--- Store to HDFS
 STORE platform_stats INTO '/user/bigdata/social_media/output/pig_kpi' USING PigStorage('\t');
 ```
 
@@ -333,7 +361,6 @@ The Hive script (`hive/social_media_analytics.hql`) defines the structured wareh
 CREATE DATABASE IF NOT EXISTS social_media_dw;
 USE social_media_dw;
 
--- External Raw Table over HDFS
 CREATE EXTERNAL TABLE IF NOT EXISTS raw_social_posts (
     post_id STRING, username STRING, platform STRING,
     post_text STRING, hashtags STRING,
@@ -342,7 +369,6 @@ CREATE EXTERNAL TABLE IF NOT EXISTS raw_social_posts (
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 LOCATION '/user/bigdata/social_media/input';
 
--- High-Performance Partitioned Table (ORC format with Snappy compression)
 CREATE TABLE IF NOT EXISTS partitioned_social_analytics (
     post_id STRING, username STRING, post_text STRING,
     likes INT, comments INT, shares INT, total_engagement INT
@@ -372,6 +398,41 @@ When running Spark SQL queries (e.g. `SELECT Platform, COUNT(*) FROM social_medi
 3. **Optimized Logical Plan:** Applies rule-based optimizations (constant folding, predicate pushdown, projection pruning).
 4. **Physical Plan:** Selects concrete physical execution algorithms (`HashAggregate`, `Exchange hashpartitioning`).
 
+### 5.6 Automated VS Code Launcher & Debugger Configuration
+To eliminate beginner configuration errors when executing the web application in VS Code, an **Automatic Smart Launcher** was implemented at the entry point of `app.py`:
+```python
+import os, sys, streamlit as st
+
+if not st.runtime.exists():
+    from streamlit.web import cli as stcli
+    sys.argv = ["streamlit", "run", os.path.abspath(__file__)]
+    sys.exit(stcli.main())
+```
+Additionally, a dedicated debugging configuration was engineered in `.vscode/launch.json`:
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Streamlit Dashboard",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "streamlit",
+      "args": ["run", "${workspaceFolder}/app.py"]
+    }
+  ]
+}
+```
+This enables running the entire application simply by pressing **`F5`** or clicking the green **"Play"** button in VS Code.
+
+### 5.7 GitHub Actions Continuous Integration (CI/CD) Pipeline
+An automated DevOps workflow was constructed in `.github/workflows/ci.yml`. On every push to the GitHub repository:
+1. Provisions an Ubuntu Linux virtual environment.
+2. Sets up Python 3.11 and Java JDK 11 (for Apache Spark).
+3. Installs dependencies from `requirements.txt`.
+4. Executes automated assertion tests across data cleaning, VADER sentiment scoring, Spark SQL execution, and RDD word count extraction.
+5. Emits a real-time status badge to the repository header.
+
 ---
 
 # CHAPTER 6: RESULTS, TESTING AND DISCUSSION
@@ -399,9 +460,16 @@ When running Spark SQL queries (e.g. `SELECT Platform, COUNT(*) FROM social_medi
   4. `#ai` (19 mentions)
   5. `#machinelearning` (18 mentions)
 
-### 6.3 Software Test Cases & Verification Table
+### 6.3 Big Data Dashboard Page Walkthrough
+The updated web dashboard includes the dedicated **Big Data Tools (Spark, Hive, Pig, Hadoop)** page structured into four interactive tabs:
+1. **⚡ Apache Spark Tab:** Contains a live Spark SQL editor with pre-built queries, execution outputs table, and an expandable viewer for the **Spark Catalyst Optimizer Physical Plan**.
+2. **🐝 Apache Hive Tab:** Displays the HiveQL DDL commands, partitioned ORC table definitions, and a direct download button for `social_media_analytics.hql`.
+3. **🐷 Apache Pig Tab:** Shows the complete Pig Latin dataflow code with interactive documentation on Pig data types (Atoms, Tuples, Bags, Maps).
+4. **🐘 Hadoop Tab:** Displays the streaming Mapper and Reducer code and includes an interactive **"Run Hadoop MapReduce Simulation"** button that executes parallel key-value reductions in real time.
 
-| Test ID | Big Data Module | Test Scenario | Expected Result | Actual Result | Status |
+### 6.4 Software Test Cases & Verification Table
+
+| Test ID | Module | Test Scenario | Expected Result | Actual Result | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **TC-01** | Hadoop HDFS | Ingestion of raw CSV to HDFS path | Files stored in `/user/bigdata/input` | Verified on HDFS | **PASS** |
 | **TC-02** | Hadoop MapReduce | Streaming tokenization (`mapper.py` + `reducer.py`) | Emits sorted (token, count) pairs | Verified streaming output | **PASS** |
@@ -411,7 +479,9 @@ When running Spark SQL queries (e.g. `SELECT Platform, COUNT(*) FROM social_medi
 | **TC-06** | Spark SQL | Interactive query execution | Returns grouped aggregates with Catalyst plan | Output & plan displayed | **PASS** |
 | **TC-07** | Spark RDD | Distributed `reduceByKey` token count | Produces sorted array of token counts | Top hashtags extracted | **PASS** |
 | **TC-08** | NLP Engine | VADER sentiment scoring | Classifies posts into Pos/Neu/Neg | Accurate classifications | **PASS** |
-| **TC-09** | Cloud Deployment | Streamlit Cloud synchronization | App accessible via public web URL | Live on Streamlit Cloud | **PASS** |
+| **TC-09** | VS Code Launcher | Running `python app.py` or pressing Play | Auto-redirects to `streamlit run app.py` | Browser opens automatically | **PASS** |
+| **TC-10** | GitHub CI/CD | Push to repository `main` branch | Runs GitHub Actions workflow and passes | All assertions passed | **PASS** |
+| **TC-11** | Cloud Deployment | Streamlit Cloud deployment | App accessible via public web URL | Live on Streamlit Cloud | **PASS** |
 
 ---
 
@@ -422,6 +492,7 @@ When running Spark SQL queries (e.g. `SELECT Platform, COUNT(*) FROM social_medi
 2. **In-Memory Speedup:** PySpark execution accelerates queries up to 100x compared to traditional MapReduce.
 3. **Partitioned Data Warehousing:** Hive ORC storage with Snappy compression reduces I/O by pruning unneeded partitions.
 4. **Interactive BI:** The Streamlit dashboard bridges the gap between terminal-based Big Data tools and user-friendly web interfaces.
+5. **Zero-Configuration Development:** VS Code auto-launcher and GitHub Actions CI automate execution and validation.
 
 ### 7.2 Limitations
 1. **Cluster Resource Overhead:** Full multi-node Hadoop/Hive clusters require significant server infrastructure.
@@ -436,7 +507,7 @@ When running Spark SQL queries (e.g. `SELECT Platform, COUNT(*) FROM social_medi
 
 # CHAPTER 8: CONCLUSION
 
-The mini-project **"Social Media Analytics Using Big Data & Python"** successfully demonstrates an end-to-end Big Data architecture integrating **Hadoop, Apache Pig, Apache Hive, and Apache Spark**. By leveraging HDFS for fault-tolerant storage, MapReduce and Pig for batch ETL, Hive for partitioned warehousing, and PySpark for in-memory analytics, the system transforms massive volumes of noisy social media text into actionable intelligence. Accompanied by an interactive cloud-deployed dashboard with live Spark SQL execution and sentiment inference, this project serves as a comprehensive academic submission for B.Tech Computer Science and Engineering (Artificial Intelligence).
+The mini-project **"Social Media Analytics Using Big Data & Python"** successfully demonstrates an end-to-end Big Data architecture integrating **Hadoop, Apache Pig, Apache Hive, and Apache Spark**. By leveraging HDFS for fault-tolerant storage, MapReduce and Pig for batch ETL, Hive for partitioned warehousing, and PySpark for in-memory analytics, the system transforms massive volumes of noisy social media text into actionable intelligence. Accompanied by an interactive cloud-deployed dashboard with live Spark SQL execution, sentiment inference, automated VS Code debugging, and continuous integration, this project serves as an exemplary academic submission for Bachelor of Technology in Computer Science and Engineering (Artificial Intelligence).
 
 ---
 
