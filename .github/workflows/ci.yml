@@ -1,0 +1,49 @@
+name: Big Data Analytics CI & Verification
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: "pip"
+
+    - name: Set up Java JDK 11 (for Apache Spark / PySpark)
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Verify Big Data Modules & Syntactical Integrity
+      run: |
+        python -c "
+        import modules
+        from modules.data_processing import load_data, clean_data, get_summary_metrics
+        from modules.sentiment_analysis import analyze_dataframe_sentiment, get_sentiment_summary
+        from modules.spark_processing import execute_spark_sql, get_spark_rdd_wordcount
+
+        df = load_data('data/social_media_data.csv')
+        clean_df, _ = clean_data(df)
+        analyzed = analyze_dataframe_sentiment(clean_df)
+        assert len(analyzed) > 200, 'Dataset validation failed'
+        res, engine, _ = execute_spark_sql(clean_df, 'SELECT Platform, COUNT(*) FROM social_media_posts GROUP BY Platform')
+        assert len(res) == 3, 'Spark SQL validation failed'
+        print('All Big Data modules verified successfully on GitHub Actions!')
+        "

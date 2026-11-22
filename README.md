@@ -1,6 +1,9 @@
 # Social Media Analytics Using Big Data & Python
 ## (Apache Spark • Apache Hive • Apache Pig • Hadoop)
 
+[![Big Data Analytics CI](https://github.com/ShaikSanaFarooha/Social-Media-Analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/ShaikSanaFarooha/Social-Media-Analytics/actions)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io)
+
 **Academic Domain:** Big Data Analytics & Artificial Intelligence  
 **Project Category:** B.Tech Computer Science and Engineering (Artificial Intelligence) Mini-Project  
 **Author:** Shaik Sana Farooha  
